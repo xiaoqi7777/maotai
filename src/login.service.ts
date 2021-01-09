@@ -164,6 +164,7 @@ export class LoginService {
     this.logger.log(`二维码文件位于${qrcodePath}`);
     this.openQrcode();
     const ticket = await this.qrcodeScan();
+    // ticket 票据
     const result = await this.validateTicket(ticket);
     if (!result) {
       this.logger.log('登录票据有误');
@@ -173,6 +174,7 @@ export class LoginService {
   }
 
   async openQrcode() {
+    // 弹出来的东西 如果不关掉他会堵塞 后面
     shell.exec(qrcodePath);
     return;
   }
@@ -260,9 +262,10 @@ export class LoginService {
             // 201 未扫描 203过期 202确认登录中 200给你个ticket
             if (code !== '200') {
               const msg = msgReg.exec(res.data)[0];
-              this.logger.log(msg);
+              this.logger.log('========>',msg);
               if (code !== '203') {
                 setTimeout(() => {
+                  // 这里的逻辑  如果弹出的图片关掉 并且没有扫码 会走这个里面 他会一直轮询 是否有扫码,一旦扫码成功不会跳出这个逻辑
                   fn();
                 }, 2000);
               } else {
